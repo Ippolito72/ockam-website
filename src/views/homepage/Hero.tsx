@@ -1,105 +1,229 @@
+import {
+  Box,
+  Button,
+  Container,
+  Heading,
+  Link as ChakraLink,
+  ResponsiveValue,
+  useTheme,
+} from '@chakra-ui/react';
+import Link from 'next/link';
 import { FunctionComponent } from 'react';
-import { Box, Container, Heading, List, ListItem, ListIcon, useTheme, Text, Flex } from '@chakra-ui/react';
-import Image from 'next/image';
+import styled from 'styled-components';
 
-import ControlIcon from '@assets/icons/control.svg';
-import PrivacyIcon from '@assets/icons/privacy.svg';
-import IntegrityIcon from '@assets/icons/integrity.svg';
-import AuthenticityIcon from '@assets/icons/authenticity.svg';
-import HeroLinearGradient from '@assets//images/hero-linear-gradient.png'
-import CopyToClipboard from '@components/CopyToClipboard';
-import CodeOneImage from '@assets/images/code1.png';
+import { BUILD_DEMO } from '@root/consts/externalResources';
+import { CONTACT_FORM_PATH } from '@root/consts/paths';
 
+import RotatingHeading from './RotatingHeading';
 
-const CODE_TEXT = `# Install Ockam Command
-brew install ockam
-# If you don't use Homebrew, look for alternate ways to install here:
-# https://docs.ockam.io/ockam-open-source#get-started
-
-# Create Two Ockam Nodes - n1 and n2
-ockam node create n1
-ockam node create n2
-
-# Create a Secure Channel from n1 to n2 and send an encrypted message to the uppercase service on n2
-ockam secure-channel create --from /node/n1 --to /node/n2/service/api \\
-    | ockam message send "hello ockam" --from /node/n1 --to -/service/uppercase
-
-# Delete all nodes.
-ockam node delete --all
+const HeroBox = styled(Box)`
+  &:before {
+    content: '';
+    background: rgb(10, 10, 10);
+    background-image: linear-gradient(0deg, rgb(40, 40, 40), rgb(10, 10, 10));
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+  }
+  color: white;
+  overflow: hidden;
+  position: relative;
 `;
-
-const SUBHEADING_TEXTS = [
-  { icon: IntegrityIcon, text: 'Integrity' },
-  { icon: AuthenticityIcon, text: 'Authenticity' },
-  { icon: PrivacyIcon, text: 'Privacy' },
-  { icon: ControlIcon, text: 'Control' },
-];
-
-
-const Hero: FunctionComponent = () => {
+type Props = {
+  text?: string;
+  subtext?: string;
+  landingPage?: boolean;
+};
+const Hero: FunctionComponent<Props> = ({ text, subtext, landingPage }) => {
   const { gradients } = useTheme();
 
+  const heroText = (): JSX.Element => {
+    if (!text) {
+      return (
+        <>
+          Build{' '}
+          <Box as="span" bgImage={gradients.primary} bgClip="text">
+            Trust
+          </Box>
+        </>
+      );
+    }
+    return (
+      <>
+        {text.split(/(_\w.*?\w_)/).map((string) => {
+          const highlight = string.match(/^_(\w.*?\w)_$/);
+          if (highlight) {
+            return (
+              <Box as="span" bgImage={gradients.primary} bgClip="text">
+                {highlight[1]}
+              </Box>
+            );
+          }
+          return string;
+        })}
+      </>
+    );
+  };
+
+  const calculatedHeadingSize = ():
+    | ResponsiveValue<(string & {}) | '3xl' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'xs' | '4xl'>
+    | undefined => {
+    const standard = { base: '3xl', lg: 'h1' };
+    if (!text) return standard;
+    if (text?.length > 40) return { base: '3xl', lg: '4xl' };
+    return standard;
+  };
+  const calculatedLineHeight = (): ResponsiveValue<number> => {
+    const standard = { base: 1, lg: 1 };
+    if (!text) return standard;
+    if (text?.length > 40) return { base: 1, lg: 1.2 };
+    return standard;
+  };
+
+  const ctas = (): JSX.Element => {
+    if (landingPage) {
+      return (
+        <Box textAlign="center" my={14}>
+          <Link href="#why" passHref>
+            <Button
+              position="relative"
+              borderWidth={1}
+              color="white"
+              borderStyle="solid"
+              borderColor="transparent"
+              backgroundColor="rgb(10, 10, 10)"
+              backgroundClip="padding-box"
+              _before={{
+                content: "''",
+                backgroundImage: gradients.primary,
+                borderRadius: '4px',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: -1,
+                margin: '-1px',
+                boxShadow: '0 0 50px 0px #52c7ea',
+              }}
+              _hover={{
+                backgroundImage: gradients.primary,
+                borderColor: 'rgb(10, 10, 10)',
+                color: 'rgb(10, 10, 10)',
+              }}
+              _active={{
+                backgroundImage: `${gradients.primary}`,
+                color: 'white',
+                boxShadow: '0 0 60px 10px #52c7ea',
+              }}
+              _focus={{
+                backgroundImage: `${gradients.primary}`,
+                color: 'white',
+                boxShadow: '0 0 60px 10px #52c7ea',
+              }}
+            >
+              Tell me more
+            </Button>
+          </Link>
+        </Box>
+      );
+    }
+    return (
+      <Box textAlign="center" my={14}>
+        <Link href={BUILD_DEMO.href} passHref>
+          <Button
+            color="rgb(40, 40, 40)"
+            border="1px solid white"
+            mb={{ base: 5, sm: 0 }}
+            ml={{ base: 2.5, sm: 3 }}
+            mr={{ base: 2.5, sm: 3 }}
+            _hover={{
+              backgroundColor: 'rgb(10, 10, 10)',
+              color: 'white',
+            }}
+          >
+            Start Building
+          </Button>
+        </Link>
+        <Link href={CONTACT_FORM_PATH} passHref>
+          <Button
+            position="relative"
+            color="white"
+            borderWidth={1}
+            borderStyle="solid"
+            borderColor="transparent"
+            backgroundColor="rgb(10, 10, 10)"
+            backgroundClip="padding-box"
+            mb={{ base: 5, sm: 0 }}
+            ml={{ base: 2.5, sm: 3 }}
+            mr={{ base: 2.5, sm: 3 }}
+            _before={{
+              content: "''",
+              backgroundImage: gradients.primary,
+              borderRadius: '4px',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: -1,
+              margin: '-1px',
+              boxShadow: '0 0 50px 0px #52c7ea',
+            }}
+            _hover={{
+              backgroundImage: gradients.primary,
+              borderColor: 'rgb(10, 10, 10)',
+              color: 'rgb(10, 10, 10)',
+            }}
+            _active={{
+              backgroundImage: `${gradients.primary}`,
+              color: 'white',
+              boxShadow: '0 0 60px 10px #52c7ea',
+            }}
+            _focus={{
+              backgroundImage: `${gradients.primary}`,
+              color: 'white',
+              boxShadow: '0 0 60px 10px #52c7ea',
+            }}
+          >
+            Get a Demo
+          </Button>
+        </Link>
+      </Box>
+    );
+  };
   return (
-    <Box
-      bgImage={HeroLinearGradient.src}
-      bgPosition="center bottom"
-      bgRepeat="no-repeat"
-    >
+    <HeroBox>
       <Container
         variant="section"
-        pb={{ base: 10, lg: 16  }}
+        pt={{ base: 10, lg: 16 }}
+        pb={{ base: 0, lg: 0 }}
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
-        height={{ base: "calc(100vh - 108px)", lg: "50rem" }}
       >
         <Box>
-          <Heading as="h1" size="h1" fontWeight="extrabold" textAlign="center">
-            Build{' '}
-            <Box as="span" bgImage={gradients.primary} bgClip="text">
-              Trust
-            </Box>
-          </Heading>
-          <List
-            mt={{ base: 8, lg: 10 }}
-            display="flex"
-            justifyContent="center"
-            flexWrap="wrap"
-            flexDirection="row"
+          <Heading
+            as="h1"
+            size={calculatedHeadingSize()}
+            fontWeight="extrabold"
+            textAlign="center"
+            color="white"
+            my={16}
+            lineHeight={calculatedLineHeight()}
           >
-            {SUBHEADING_TEXTS.map(({ text, icon }) => (
-              <ListItem
-                key={text}
-                display="flex"
-                alignItems="center"
-                px={{ base: 4, lg: 8 }}
-                mb={{ base: 5, lg: 0 }}
-                fontSize={{ base: 'lg', lg: 'xl' }}
-                fontWeight="medium"
-                lineHeight={1.3}
-                color="brand.900"
-              >
-                <ListIcon as={icon} w={6} h={6} mr={4} />
-                {text}
-              </ListItem>
-            ))}
-          </List>
+            <ChakraLink href="#why" _hover={{ textDecoration: 'none', cursor: 'default' }}>
+              {heroText()}
+            </ChakraLink>
+          </Heading>
+          {ctas()}
+          <RotatingHeading text={subtext} />
         </Box>
-
-
-
-        <Text maxW="2xl" fontSize="lg" textAlign="center">
-          Ockam is a suite of open source tools, programming libraries, and managed cloud services to orchestrate end-to-end encryption, mutual authentication, key management, credential management, and authorization policy enforcement – at massive scale.
-        </Text>
-        <Flex maxW="46rem"  boxShadow="xl">
-          <Box position="relative" fontSize={0} zIndex={0}>
-            <CopyToClipboard position="absolute" bottom={5} right={5} codeText={CODE_TEXT} />
-            <Image src={CodeOneImage} alt="Code block 1" placeholder="blur" priority />
-          </Box>
-        </Flex>
       </Container>
-    </Box>
-
+    </HeroBox>
   );
 };
 

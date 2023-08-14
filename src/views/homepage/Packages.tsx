@@ -1,245 +1,527 @@
-import { FunctionComponent, SVGAttributes } from 'react';
+import { FunctionComponent } from 'react';
 import {
-  List,
-  ListItem,
-  ListIcon,
   Container,
-  Flex,
-  Text,
-  Heading,
-  Grid,
-  GridItem,
   Box,
-  Icon,
+  SimpleGrid,
+  Table,
+  Thead,
+  Tbody,
+  Tfoot,
+  Tr,
+  Th,
+  Td,
+  TableContainer,
+  Heading,
+  Flex,
+  ListItem,
+  List,
+  useTheme,
+  Link,
 } from '@chakra-ui/react';
+import { HiBadgeCheck as Check } from 'react-icons/hi';
 
-import ArrowIcon from '@assets/icons/arrow.svg';
-import CloudIcon from '@assets/icons/cloud.svg';
-import PackagesIcon from '@assets/icons/packages.svg';
-import GreenIconWrapper from '@components/GreenIconWrapper';
-import Transition from '@root/components/Transition/Transition';
-import CTALink from '@components/CTALink';
+import ActionButton from '@components/Packaging/ActionButton';
+import PricingCard from '@components/Packaging/PricingCard';
+import { CONTACT_FORM_PATH } from '@root/consts/paths';
 
-const TITLE = 'Ockam is for Everyone';
-const TEXTS = [
-  'We built Ockam with all builders in mind. We have two different configurations for you to choose from:',
-];
-
-const CARDS = [
-  {
-    icon: PackagesIcon,
-    title: 'Open Source',
-    text: 'The Tools for Builders',
-    descriptions: [
-      'Ockam Open Source can be used for small scale projects, with simple architectures, that can be manually configured. ',
-      'Ockam Open Source has all of the Ockam protocols, tools, and programming libraries that a developer needs to Build Trust. ',
-    ],
-    items: [
-      { text: 'Scale: Manually configurable', icon: ArrowIcon },
-      { text: 'Key generation and storage', icon: ArrowIcon },
-      { text: 'Secure Channels', icon: ArrowIcon },
-      { text: 'End-to-end encrypted messaging', icon: ArrowIcon },
-      { text: 'Ready-to-use Packages', icon: ArrowIcon },
-      { text: 'Community Supported', icon: ArrowIcon },
-      { text: 'Apache 2 License', icon: ArrowIcon },
-    ],
-    link: {
-      label: 'Get Started',
-      href: 'https://docs.ockam.io/open-source',
-    },
-  },
-  {
-    icon: CloudIcon,
-    title: 'Orchestrator',
-    text: 'The Service for Enterprises',
-    descriptions: [
-      'Ockam Orchestrator is a fully-managed cloud service that includes all of the features and tools of Ockam Open Source. Orchestrator also has all of the features that you need to collaborate with your team, to integrate with automated infrastructure, to connect with data-layer stores and message brokers, and to facilitate massive scale throughput. ',
-    ],
-    items: [
-      { text: 'Scale: Automation-required', icon: ArrowIcon },
-      { text: 'Key policy management', icon: ArrowIcon },
-      { text: 'Add-on connectors to data services', icon: ArrowIcon },
-      { text: 'Attribute Based Access Controls (ABAC)', icon: ArrowIcon },
-      { text: 'Message delivery guarantees', icon: ArrowIcon },
-      { text: 'Enterprise-grade support', icon: ArrowIcon },
-      { text: 'AWS Marketplace', icon: ArrowIcon },
-    ],
-    link: {
-      label: 'Get Started',
-      href: 'https://docs.ockam.io/orchestrator',
-    },
-  },
-];
-
-type CardGridItemProps = {
-  icon: FunctionComponent<SVGAttributes<SVGElement>>;
-  title: string;
+type Cta = {
   text: string;
-  descriptions: string[];
-  items: Array<{
-    text: string;
-    icon: FunctionComponent<SVGAttributes<SVGElement>>;
-  }>;
-  link: {
-    label: string;
-    href: string;
-  };
-  columnOrder: number;
+  url: string;
+};
+type Tier = {
+  name: string;
+  text: string;
+  price: string;
+  price_interval?: string;
+  price_unit?: string;
+  floor?: string;
+  isPopular?: boolean;
+  cta: Cta;
+};
+type Feature = {
+  name: string;
+  description?: string;
+  more_info_link?: string;
+  tiers: string[];
+  hasLimits?: boolean;
+  limits?: string;
+  onCard?: boolean;
 };
 
-const CardGridItem: FunctionComponent<CardGridItemProps> = ({
-  icon,
-  title,
-  text,
-  descriptions,
-  items,
-  columnOrder,
-  link,
-}) => (
-  <>
-    <GridItem area={`header${columnOrder}`} maxW={{ base: 'lg', lg: '25rem' }}>
-      <Flex
-        align={{ base: 'center', lg: 'initial' }}
-        w="full"
-        h="full"
-        pt={{ base: 4, lg: 6 }}
-        px={{ base: 4, lg: 6 }}
-        textAlign="left"
-        border="1px"
-        borderColor="gray.100"
-        borderTopRadius="base"
-      >
-        <GreenIconWrapper>
-          <Icon as={icon} color="white" w={6} h={6} />
-        </GreenIconWrapper>
+const TIERS: Tier[] = [
+  {
+    name: 'Starter',
+    text: 'The Tools for Builders',
+    price: '$0',
+    price_interval: 'mo',
+    isPopular: true,
+    cta: {
+      text: 'Get started →',
+      url: '/download',
+    },
+  },
 
-        <Flex flex={1} direction="column" pl={{ base: 4, lg: 6 }}>
-          <Text fontWeight="bold" fontSize="xl" color="brand.900" mb={3}>
-            {title}
-          </Text>
+  {
+    name: 'Team',
+    text: 'The Tools for Builders',
+    price: '$9',
+    price_interval: 'mo',
+    cta: {
+      text: 'Start 14-day trial →',
+      url: '/download',
+    },
+  },
 
-          <Text mb={4} fontWeight="regular" color="brand.900" fontSize={{ base: 'sm', lg: 'md' }}>
-            {text}
-          </Text>
+  {
+    name: 'Basic',
+    text: 'The Tools for Builders',
+    price: '$200',
+    price_interval: 'mo',
+    cta: {
+      text: 'Start 14-day trial →',
+      url: '/download',
+    },
+  },
 
-          {descriptions.map((descriptionText) => (
-            <Text
-              key={descriptionText}
-              fontSize="sm"
-              color="gray.500"
-              lineHeight={1.5}
-              _notLast={{ mb: 4 }}
-              _last={{ mb: 8 }}
-            >
-              {descriptionText}
-            </Text>
-          ))}
-        </Flex>
-      </Flex>
-    </GridItem>
+  {
+    name: 'Enterprise',
+    text: 'The Tools for Builders',
+    price: 'Talk to sales',
+    cta: {
+      text: 'Talk to sales →',
+      url: `${CONTACT_FORM_PATH}`,
+    },
+  },
 
-    <GridItem area={`body${columnOrder}`} mb={{ base: 10, lg: 0 }}>
-      <List
-        spacing={8}
-        w="full"
-        h="full"
-        py={6}
-        px={{ base: 3, lg: 6 }}
-        border="1px"
-        borderColor="gray.100"
-        borderTop={0}
-        borderBottom="4px"
-        borderBottomColor="avocado.500"
-        borderBottomRadius="base"
-      >
-        {items.map(({ icon: itemIcon, text: itemText }) => (
-          <ListItem
-            key={itemText}
-            display="flex"
-            alignItems="center"
-            fontSize={{ base: 'sm', lg: 'md' }}
-          >
-            <ListIcon bgColor="gray.100" mr={{ base: 3, lg: 5 }} w={6} h={6} color="brand.900">
-              <Icon as={itemIcon} />
-            </ListIcon>
+  {
+    name: 'Platform',
+    text: 'The Tools for Builders',
+    price: 'Talk to sales',
+    cta: {
+      text: 'Talk to sales →',
+      url: `${CONTACT_FORM_PATH}`,
+    },
+  },
+];
 
-            {itemText}
-          </ListItem>
-        ))}
-        <CTALink display="block" mt={10} text={link.label} href={link.href} isExternal />
-      </List>
+const FEATURES: Feature[] = [
+  {
+    name: 'Introductory price guarantee',
+    tiers: ['Team', 'Basic', 'Pro', 'Enterprise', 'Platform'],
+    onCard: true,
+  },
 
-    </GridItem>
-  </>
-);
+  { name: 'Spaces', tiers: ['*'], hasLimits: true, onCard: true },
+  // { name: 'Space administrators', tiers: ['*'], hasLimits: true, onCard: true  },
 
-const Packages: FunctionComponent = () => (
-    <Container variant="section" py={{ base: 16, lg: 24 }}>
-      <Box
-        id="products"
-        visibility="hidden"
-        position="absolute"
-        left={0}
-        top={{ base: '50px', lg: '80px' }}
-      />
-      <Flex
-        direction="column"
-        justify="center"
-        maxW="41.5rem"
-        textAlign="center"
-        mb={{ base: 12, lg: 16 }}
-      >
-        <Heading as="h3" size="h3" mb={{ base: 6, lg: 8 }}>
-          {TITLE}
-        </Heading>
+  { name: 'Projects per space', tiers: ['*'], hasLimits: true, onCard: false },
+  // { name: 'Project administrators', tiers: ['*'], hasLimits: true, onCard: true  },
 
-        {TEXTS.map((text) => (
-          <Text key={text} fontSize={{ lg: 'lg' }} mb={{ base: 4, lg: 5 }}>
-            {text}
-          </Text>
-        ))}
-      </Flex>
+  { name: 'Project members', tiers: ['*'], hasLimits: true, onCard: true },
 
-      <Grid
-        templateAreas={{
-          base: `
-        "header1"
-        "body1"
-        "header2"
-        "body2"
-      `,
-          lg: `
-        "header1 header2"
-        "body1 body2"
-      `,
-        }}
-        gridTemplateRows={{
-          base: 'repeat(4, auto)',
-          lg: 'repeat(2, auto)',
-        }}
-        gridTemplateColumns={{
-          base: '100%',
-          lg: 'repeat(2, 1fr)',
-        }}
-        columnGap={16}
-      >
-        <Transition duration={300} delay={500}>
-          <Box height="100%" display="flex" flexDirection="column" justifyContent="space-between">
-            <CardGridItem columnOrder={1} {...CARDS[0]} />
-          </Box>
-        </Transition>
-        <Transition
-          duration={300}
-          delay={500}
-          initialState={{ opacity: 0, y: -40 }}
-          finalState={{ opacity: 1, y: 0 }}
+  { name: 'Project authority nodes', tiers: ['*'], hasLimits: true, onCard: false },
+  { name: 'Credential authorities', tiers: ['*'], hasLimits: true, onCard: false },
+
+  // { name: 'Throughput - Platform API requests', tiers: ['*'], hasLimits: true, onCard: false },
+
+  // { name: 'TCP transport endpoints', tiers: ['*'], hasLimits: true, onCard: false },
+
+  // { name: 'Transparency logs', tiers: ['Pro', 'Enterprise', 'Platform'], onCard: true },
+  // { name: 'Audit logs', tiers: ['*'], hasLimits: true, onCard: true },
+
+  // { name: 'Authority node identity', tiers: ['*'], hasLimits: true, onCard: false },
+  // { name: 'Authority node identity keys', tiers: ['*'], hasLimits: true, onCard: false },
+
+  // { name: 'Project enrollers', tiers: ['*'], hasLimits: true, onCard: false },
+  // { name: 'Project members', tiers: ['*'], hasLimits: true, onCard: true },
+
+  { name: 'Enrollment methods', tiers: ['*'], hasLimits: true, onCard: true },
+
+  { name: 'Project nodes', tiers: ['*'], hasLimits: true, onCard: true },
+
+  // { name: 'Encrypted relays', tiers: ['*'], hasLimits: true, onCard: true },
+
+  { name: 'Identities', tiers: ['*'], hasLimits: true, onCard: true },
+  { name: 'Included data transfer', tiers: ['*'], hasLimits: true, onCard: false },
+  { name: 'Cloud managed', tiers: ['*'], onCard: true },
+  { name: 'Attribute-based access controls', tiers: ['*'], onCard: true },
+  { name: 'Ockam Command', tiers: ['*'], onCard: true },
+  { name: 'Programming libraries', tiers: ['*'], onCard: true },
+  { name: 'Community-based support', tiers: ['*'], onCard: true },
+  { name: 'Ockam support', tiers: ['Basic', 'Pro', 'Enterprise', 'Platform'], onCard: true },
+  { name: 'Premium Ockam support', tiers: ['Pro', 'Enterprise', 'Platform'], onCard: true },
+  { name: 'Volume discounts', tiers: ['Enterprise', 'Platform'], onCard: true },
+  { name: 'Service Level Agreements (SLAs)', tiers: ['Enterprise', 'Platform'] },
+  { name: 'Customized terms', tiers: ['Enterprise', 'Platform'] },
+  { name: 'Private labelling', tiers: ['Platform'], onCard: true },
+  { name: 'Custom domains', tiers: ['Platform'] },
+];
+
+const LIMITS: { [id: string]: { [id: string]: string } } = {
+  Spaces: {
+    Starter: 'Up to 1',
+    Team: 'Up to 1',
+    Basic: 'Unlimited',
+    Pro: 'Unlimited',
+    Enterprise: 'Unlimited',
+    Platform: 'Unlimited',
+  },
+
+  'Projects per space': {
+    Starter: 'Up to 1',
+    Team: 'Up to 1',
+    Basic: 'Unlimited',
+    Pro: 'Unlimited',
+    Enterprise: 'Unlimited',
+    Platform: 'Unlimited',
+  },
+
+  'Project authority nodes': {
+    Starter: 'Up to 1',
+    Team: 'Up to 1',
+    Basic: 'Unlimited',
+    Pro: 'Unlimited',
+    Enterprise: 'Unlimited',
+    Platform: 'Unlimited',
+  },
+  'Credential authorities': {
+    Starter: 'Up to 1',
+    Team: 'Up to 1',
+    Basic: 'Unlimited',
+    Pro: 'Unlimited',
+    Enterprise: 'Unlimited',
+    Platform: 'Unlimited',
+  },
+
+  // 'Throughput - Platform API requests': {
+  //   Starter: 'Up to X',
+  //   Team: 'Up to Y',
+  //   Basic: 'Unlimited',
+  //   Pro: 'Unlimited',
+  //   Enterprise: 'Unlimited',
+  //   Platform: 'Unlimited',
+  // },
+
+  // 'TCP transport endpoints': {
+  //   Starter: 'Up to X',
+  //   Team: 'Up to Y',
+  //   Basic: 'Unlimited',
+  //   Pro: 'Unlimited',
+  //   Enterprise: 'Unlimited',
+  //   Platform: 'Unlimited',
+  // },
+  // 'Audit logs': {
+  //   Starter: 'Up to X',
+  //   Team: 'Up to Y',
+  //   Basic: 'Unlimited',
+  //   Pro: 'Unlimited',
+  //   Enterprise: 'Unlimited',
+  //   Platform: 'Unlimited',
+  // },
+
+  // 'Authority node identity': {
+  //   Starter: 'Up to X',
+  //   Team: 'Up to Y',
+  //   Basic: 'Unlimited',
+  //   Pro: 'Unlimited',
+  //   Enterprise: 'Unlimited',
+  //   Platform: 'Unlimited',
+  // },
+  // 'Authority node identity keys': {
+  //   Starter: 'Up to X',
+  //   Team: 'Up to Y',
+  //   Basic: 'Unlimited',
+  //   Pro: 'Unlimited',
+  //   Enterprise: 'Unlimited',
+  //   Platform: 'Unlimited',
+  // },
+
+  // 'Project enrollers': {
+  //   Starter: 'Up to X',
+  //   Team: 'Up to Y',
+  //   Basic: 'Unlimited',
+  //   Pro: 'Unlimited',
+  //   Enterprise: 'Unlimited',
+  //   Platform: 'Unlimited',
+  // },
+  'Project members': {
+    Starter: 'Up to 2',
+    Team: 'Up to 10',
+    Basic: 'Unlimited',
+    Pro: 'Unlimited',
+    Enterprise: 'Unlimited',
+    Platform: 'Unlimited',
+  },
+
+  'Enrollment methods': {
+    Starter: '1',
+    Team: 'Up to 2',
+    Basic: 'Unlimited',
+    Pro: 'Unlimited',
+    Enterprise: 'Unlimited',
+    Platform: 'Unlimited',
+  },
+
+  'Project nodes': {
+    Starter: 'Up to 5',
+    Team: 'Up to 10',
+    Basic: '40 included',
+    Enterprise: 'Unlimited',
+    Platform: 'Unlimited',
+  },
+
+  // 'Encrypted relays': {
+  //   Starter: 'Up to X',
+  //   Team: 'Up to Y',
+  //   Basic: 'Unlimited',
+  //   Pro: 'Unlimited',
+  //   Enterprise: 'Unlimited',
+  //   Platform: 'Unlimited',
+  // },
+  // 'Team members': {
+  //   Starter: 'Up to X',
+  //   Team: 'Up to Y',
+  //   Basic: 'Unlimited',
+  //   Pro: 'Unlimited',
+  //   Enterprise: 'Unlimited',
+  //   Platform: 'Unlimited',
+  // },
+  Identities: {
+    Starter: 'Up to 5',
+    Team: 'Up to 20',
+    Basic: 'Unlimited',
+    Pro: 'Unlimited',
+    Enterprise: 'Unlimited',
+    Platform: 'Unlimited',
+  },
+  'Included data transfer': {
+    Starter: '10/GB/mo',
+    Team: '80/GB/mo',
+    Basic: '2,000/GB/mo',
+    Pro: '50,000/GB/mo',
+    Enterprise: 'Custom',
+    Platform: 'Custom',
+  },
+};
+
+const hasFeature = (tier: Tier, feature: Feature): boolean => {
+  if (feature.tiers.indexOf('*') >= 0) return true;
+  if (feature.tiers.indexOf(tier.name) >= 0) return true;
+  return false;
+};
+
+const tierLimit = (tier: Tier, feature: Feature): string | undefined => {
+  if (feature.name in LIMITS) {
+    return LIMITS[feature.name][tier.name];
+  }
+  return undefined;
+};
+const featureValue = (tier: Tier, feature: Feature): string => {
+  if (hasFeature(tier, feature)) {
+    if (feature.hasLimits) {
+      return tierLimit(tier, feature) || '';
+    }
+    return '✔️';
+  }
+  return `\u2013`;
+};
+
+const CARDS = TIERS.filter((tier) => !['Platform'].includes(tier.name)).map((tier, idx) => {
+  const features = FEATURES.filter((f) => f.onCard)
+    .filter((feature) => {
+      if (idx > 0) {
+        // if (feature.name === 'Introductory price guarantee') return true;
+        if (feature.hasLimits) {
+          if (tierLimit(tier, feature) === tierLimit(TIERS[idx - 1], feature)) {
+            return false;
+          }
+          return true;
+        }
+        if (feature.tiers.indexOf('*') >= 0) return false;
+        if (hasFeature(TIERS[idx - 1], feature)) return false;
+      }
+      if (feature.tiers.indexOf('*') >= 0) return true;
+      if (feature.tiers.indexOf(tier.name) >= 0) return true;
+      return false;
+    })
+    .map((feature) => {
+      const f = { ...feature };
+      if (f.hasLimits) {
+        f.limits = tierLimit(tier, feature);
+      }
+      return f;
+    });
+  return { ...tier, features };
+});
+
+const Packages: FunctionComponent = () => {
+  const theme = useTheme();
+
+  return (
+    <Container id="pricing" variant="section" py={{ base: 16, lg: 24 }}>
+      <Heading as="h1" size="h2">
+        Elevate your security
+      </Heading>
+      <Heading as="h2" size="h4" color="gray.400">
+        Keep trust at the application layer instead of deferring to the network
+      </Heading>
+      <Box as="section" py="14" px={{ base: '4', md: '8' }}>
+        <SimpleGrid
+          columns={{ base: 1, lg: 4 }}
+          spacing={{ base: '8', lg: '0' }}
+          maxW="7xl"
+          mx="auto"
+          justifyItems="center"
+          alignItems="stretch"
         >
-          <Box height="100%" display="flex" flexDirection="column" justifyContent="space-between">
-            <CardGridItem columnOrder={2} {...CARDS[1]} />
+          {CARDS.map((card) => (
+            <PricingCard
+              key={card.name}
+              data={{
+                price: card.price,
+                name: card.name,
+                priceUnit: card.price_unit,
+                priceInterval: card.price_interval,
+                features: card.features,
+                floor: card.floor,
+              }}
+              isPopular={card.isPopular}
+              display="flex"
+              flexDirection="column"
+              previousTier={TIERS[TIERS.findIndex((tier: Tier) => tier.name === card.name) - 1]}
+              button={
+                <ActionButton variant="outline" borderWidth="2px" mt={2} mb={8} href={card.cta.url}>
+                  {card.cta.text}
+                </ActionButton>
+              }
+            />
+          ))}
+        </SimpleGrid>
+      </Box>
+      <Box width="100%" p={4} mx={0} my={0}>
+        <Heading>What&apos;s an &quot;introductory price guarantee&quot;?</Heading>
+        We know pricing is hard to get right (this isn&apos;t our first rodeo). We&apos;re also much
+        more interested in spending our time building the most amazing product experience possible
+        rather than trying to have the perfect pricing. So the prices you see here are just enough
+        to let us get back to work. We know they&apos;ll change in the future. Will they go up? Or
+        will they go down? 🤷‍♂️ We don&apos;t know for sure.
+        <br />
+        <br />
+        What we do know is that if you sign up today no new customer will get a better deal than
+        you. If our prices go up, we agree honour the price you signed up at for 12 months. If
+        prices go down we&apos;ll automatically put you onto the better price. We&apos;re here to
+        build trust and a decades long relationship with you.
+      </Box>
+
+      <Box
+        width="100%"
+        bgGradient={`linear-gradient(296.58deg, ${theme.colors.brand['600']} -6.45%, ${theme.colors.brand['900']} 96.92%)`}
+        borderRadius="base"
+        p={4}
+        mx={0}
+        my={4}
+      >
+        <Heading color="white">Ockam Platform</Heading>
+        <Flex w="full" mt={2} flexDirection={{ base: 'column-reverse', lg: 'row' }}>
+          <Box flexGrow={0.5} width={{ base: '100%', lg: '50%' }} position="relative">
+            <ActionButton
+              href={TIERS.find((tier) => tier.name === 'Platform')?.cta.url || ''}
+              variant="solid"
+              colorScheme="whiteAlpha"
+              borderWidth="2px"
+              mt={2}
+              w={{ base: 'full', lg: 'auto' }}
+              position="absolute"
+              bottom="0"
+            >
+              {TIERS.find((tier) => tier.name === 'Platform')?.cta.text}
+            </ActionButton>
           </Box>
-        </Transition>
-      </Grid>
+          <Box flexGrow={0.5} width={{ base: '100%', lg: '50%' }} color="white">
+            If you&apos;re running a SaaS plaform, deploying solutions on-prem in your
+            customers&apos; infrastructure, or even a hybrid approach that requires you to securely
+            connect to your customers&apos; private systems then we&apos;ve got the solutions to
+            integrate directly into your own product.
+            <List spacing="1" mb="2" mt="2" mx="0" fontSize="s">
+              <ListItem fontWeight="medium">
+                <Check
+                  size="1.5em"
+                  style={{ display: 'inline-block', marginRight: '4px', verticalAlign: 'middle' }}
+                  color={theme.colors.brand['600']}
+                />
+                Service Level Agreements
+              </ListItem>
+              <ListItem fontWeight="medium">
+                <Check
+                  size="1.5em"
+                  style={{ display: 'inline-block', marginRight: '4px', verticalAlign: 'middle' }}
+                  color={theme.colors.brand['600']}
+                />
+                Customized terms
+              </ListItem>
+              <ListItem fontWeight="medium">
+                <Check
+                  size="1.5em"
+                  style={{ display: 'inline-block', marginRight: '4px', verticalAlign: 'middle' }}
+                  color={theme.colors.brand['600']}
+                />
+                Volume discounts
+              </ListItem>
+              <ListItem fontWeight="medium">
+                <Check
+                  size="1.5em"
+                  style={{ display: 'inline-block', marginRight: '4px', verticalAlign: 'middle' }}
+                  color={theme.colors.brand['600']}
+                />
+                Private labelling & reseller features
+              </ListItem>
+            </List>
+          </Box>
+        </Flex>
+      </Box>
+
+      <Box>
+        <TableContainer fontSize="xs">
+          <Table variant="simple">
+            <Thead>
+              <Tr>
+                <Th />
+                {TIERS.map((tier) => (
+                  <Th textAlign="center">{tier.name}</Th>
+                ))}
+              </Tr>
+            </Thead>
+            <Tbody>
+              {FEATURES.map((feature) => (
+                <Tr>
+                  <Td fontSize="xs">{feature.name}</Td>
+                  {TIERS.map((tier) => {
+                    if (hasFeature(tier, feature))
+                      return (
+                        <Td textAlign="center" fontSize="xx-small">
+                          {featureValue(tier, feature)}️
+                        </Td>
+                      );
+                    return <Td textAlign="center" fontSize="xs">{`\u2013`}</Td>;
+                  })}
+                </Tr>
+              ))}
+            </Tbody>
+            <Tfoot>
+              <Tr>
+                <Th />
+                {TIERS.map((tier) => (
+                  <Th>
+                    <Link href={tier.cta.url}>{tier.cta.text}</Link>
+                  </Th>
+                ))}
+              </Tr>
+            </Tfoot>
+          </Table>
+        </TableContainer>
+      </Box>
     </Container>
   );
+};
 
 export default Packages;

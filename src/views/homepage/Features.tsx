@@ -10,99 +10,134 @@ import {
   Button,
   Link,
 } from '@chakra-ui/react';
+import styled from 'styled-components';
+import { IconType } from 'react-icons';
+import {
+  HiFingerPrint,
+  HiHeart,
+  HiShieldCheck,
+  HiClock,
+  HiBan,
+  HiGlobeAlt,
+  HiLockClosed,
+  HiKey,
+  HiCubeTransparent,
+} from 'react-icons/hi';
 
 import GitHubIcon from '@assets/icons/github.svg';
-import CloudIcon from '@assets/icons/cloud.svg';
 import DeveloperIcon from '@assets/icons/developer.svg';
 import LockIcon from '@assets/icons/lock.svg';
-import DesignIcon from '@assets/icons/design.svg';
 import LeftIcon from '@assets/icons/left.svg';
 import GreenIconWrapper from '@components/GreenIconWrapper';
 import { DOCS } from '@consts/externalResources';
 
-const TITLE = 'Built for developers, by developers';
+const TITLE = 'Connect Applications, not Networks';
 const DESCRIPTIONS = [
-  'It is hard to build and scale an application that makes identity driven trust decisions. We created simple, composable building blocks so you can easily deliver secure and private applications to your customers.'
+  "Finally, you can forget about networks, clouds, gateways, protocols, routers, relays, ELBs, VPNs, VPCs, CAs, tokens, and <a bunch of other things you didn't get into this gig to deal with in the first place>",
 ];
-
+const IconLookup: { [key: string]: IconType } = {
+  fingerprint: HiFingerPrint,
+  shieldcheck: HiShieldCheck,
+  clock: HiClock,
+  heart: HiHeart,
+  ban: HiBan,
+  globe: HiGlobeAlt,
+  lock: HiLockClosed,
+  key: HiKey,
+  transparentcube: HiCubeTransparent,
+};
 const FEATURES = [
   {
-    icon: DesignIcon,
-    title: 'Secure By Design',
+    icon: LeftIcon,
+    title: 'Trust at the Application Layer',
     texts: [
-      'Secure By Design applications minimize their vulnerability surface and embrace the principle of least privilege.',
-      'Ockam’s end-to-end secure channels guarantee application layer data integrity and authenticity for all data-in-motion. This enables a deny-by-default security posture that minimizes an application’s vulnerability surface and brings true control over every access decision.',
+      'Cryptographic identities and authentication - everywhere',
+      'Managed credential authorities and ABAC',
+      'Enrollment protocols that bootstrap',
+      'BYO identity providers and access control policies',
     ],
   },
   {
     icon: LockIcon,
-    title: 'Zero Trust',
+    title: 'End-to-End Encryption for Data-in-Motion',
     texts: [
-      'Modern applications operate in untrusted networks and increasingly rely on third-party services and infrastructure. This creates exponential growth in their vulnerability surface.',
-      'Ockam gives you the tools to eliminate implicit trust in networks, services, and infrastructure. Applications get provable cryptographic identities to authenticate and authorize every access decision.',
-    ],
-  },
-  {
-    icon: LeftIcon,
-    title: 'Shift Left',
-    texts: [
-      'Software cannot be secured from the outside. Ockam provides powerful building blocks to shift security left and make it an integral part of application design and development.',
-      'Application layer trust guarantees along with tools to manage keys, credentials and authorization policies give you granular control on the security and privacy properties of your application.'
-    ],
-  },
-  {
-    icon: DeveloperIcon,
-    title: 'Developer First',
-    texts: [
-      'Application security is easiest and most cost-effective to solve at the source. Developer-first application layer security is the only viable approach to scalable secure applications.',
-      'Ockam makes it easy to securely manage the lifecycle of keys, identities, and credentials. We give you simple tools to authenticate and authorize using attribute-based credentials and policies.',
+      'Through networks, clouds, and protocols',
+      'Over enterprise messaging and event streams',
+      'For existing and new infrastructure',
+      'Built for high-thoughput, low-latency, and high-availability',
     ],
   },
   {
     icon: GitHubIcon,
-    title: 'Open Source',
-    texts: [
-      'Ockam’s protocols become ever more secure through transparency, community feedback, and scrutiny.',
-      'Add-ons can be built by anyone to create new hardware key vaults or cloud service connectors.',
-    ],
+    title: 'Open and Adaptable',
+    texts: ['Open Source', 'Add-ons for Confluent, InfluxData, Okta, KMS, UDP and more'],
   },
   {
-    icon: CloudIcon,
-    title: 'Cloud Native',
-    texts: [
-      'Ockam Orchestrator is built for enterprise scale.',
-      'Add-ons are ready-made connectors to your hosted authentication, database, and message broker services.',
-    ],
+    icon: DeveloperIcon,
+    title: 'Developer Experience',
+    texts: ['Tools and Packages', 'SLAs and Support'],
   },
 ];
 
 type FeatureProps = {
-  icon: FunctionComponent<SVGAttributes<SVGElement>>;
+  icon?: FunctionComponent<SVGAttributes<SVGElement>> | string;
   title: string;
-  texts: string[];
+  texts?: string[];
+  text?: string;
 };
 
-const Feature: FunctionComponent<FeatureProps> = ({ icon, title, texts }) => (
-  <Flex>
-    <Box flex={0} mr={5}>
-      <GreenIconWrapper>
-        <Icon as={icon} color="white" w={6} h={6} />
-      </GreenIconWrapper>
-    </Box>
+const Feature: FunctionComponent<FeatureProps> = ({ icon, title, texts, text }) => {
+  const useIcon = typeof icon === 'string' ? IconLookup[icon] : icon;
 
-    <Box>
-      <Text fontWeight="bold" fontSize="xl" color="brand.900" mb={2}>
-        {title}
-      </Text>
-
-      {texts.map((text) => (
-        <Text key={text} fontSize="sm" mb={{ base: 4, lg: 2 }} _last={{ mb: { lg: 0 } }}>
+  const displayText = (): JSX.Element | JSX.Element[] => {
+    if (texts && texts?.length > 0) {
+      return texts.map((t) => (
+        <Text key={t} fontSize="sm" mb={{ base: 4, lg: 2 }} _last={{ mb: { lg: 0 } }}>
+          {t}
+        </Text>
+      ));
+    }
+    if (text) {
+      return (
+        <Text key={`${title}-0`} fontSize="sm" mb={{ base: 4, lg: 2 }} _last={{ mb: { lg: 0 } }}>
           {text}
         </Text>
-      ))}
-    </Box>
-  </Flex>
-);
+      );
+    }
+    return <></>;
+  };
+  return (
+    <Flex>
+      <Box flex={0} mr={5}>
+        <GreenIconWrapper>
+          <Icon as={useIcon} color="white" w={6} h={6} />
+        </GreenIconWrapper>
+      </Box>
+
+      <Box>
+        <Text fontWeight="bold" fontSize="xl" color="brand.900" mb={2}>
+          {title}
+        </Text>
+        {displayText()}
+      </Box>
+    </Flex>
+  );
+};
+
+const NoBr = styled.span`
+  white-space: nowrap;
+`;
+const noWidows = (str: string): JSX.Element => {
+  const lastIndex = str.lastIndexOf(' ');
+  const sndLastIndex = str.lastIndexOf(' ', lastIndex - 1);
+  const endWords = <NoBr>{str.substring(sndLastIndex + 1)}</NoBr>;
+  const el = (
+    <>
+      {str.substring(0, sndLastIndex)} {endWords}
+    </>
+  );
+  return el;
+};
 
 const Features: FunctionComponent = () => (
   <Box bgColor="gray.50" pt={{ base: 16, lg: 24 }} pb={{ base: 20, lg: 24 }}>
@@ -117,7 +152,7 @@ const Features: FunctionComponent = () => (
       >
         <Box alignSelf="flex-start" w="full" maxW="2.5xl">
           <Heading as="h2" size="h2" lineHeight={1.3} mb={{ base: 6, lg: 8 }}>
-            {TITLE}
+            {noWidows(TITLE)}
           </Heading>
 
           {DESCRIPTIONS.map((text) => (
@@ -141,7 +176,7 @@ const Features: FunctionComponent = () => (
       </Flex>
 
       <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 3 }}
+        columns={{ base: 1, md: 2, lg: 2 }}
         spacingX={{ base: 8, md: 20, lg: 24 }}
         spacingY={{ base: 8, md: 12, lg: 16 }}
       >
@@ -152,5 +187,5 @@ const Features: FunctionComponent = () => (
     </Container>
   </Box>
 );
-
+export { Feature };
 export default Features;

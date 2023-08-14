@@ -1,3 +1,5 @@
+import { HiStar } from 'react-icons/hi';
+
 import LinkedinIcon from '@assets/icons/linkedin.svg';
 import TwitterIcon from '@assets/icons/twitter.svg';
 import GitHubIcon from '@assets/icons/github.svg';
@@ -22,7 +24,7 @@ export const TWITTER = {
 };
 
 export const GITHUB = { name: 'GitHub', href: 'https://github.com/build-trust', icon: GitHubIcon };
-export const GITHUB_REPO_OCKAM = { href: 'https://github.com/build-trust/ockam', icon: GitHubIcon };
+export const GITHUB_REPO_OCKAM = { href: 'https://github.com/build-trust/ockam', icon: HiStar };
 
 export const SUPPORT = {
   name: 'Support',
@@ -34,12 +36,17 @@ export const DISCUSSION = {
   href: 'https://github.com/build-trust/ockam/discussions',
 };
 
+export const DISCORD = {
+  name: 'Discord',
+  href: 'https://discord.gg/RAbjRr3kds',
+};
+
 export const DOCS = {
   name: 'docs.ockam.io',
   href: 'https://docs.ockam.io',
 };
 
-export const BUILD_DEMO = { href: 'https://docs.ockam.io/use-cases' };
+export const BUILD_DEMO = { href: '/download' };
 
 export default [
   CONTACT,
@@ -50,6 +57,7 @@ export default [
   GITHUB_REPO_OCKAM,
   SUPPORT,
   DISCUSSION,
+  DISCORD,
   BUILD_DEMO,
   DOCS,
 ];

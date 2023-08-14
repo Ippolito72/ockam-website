@@ -13,9 +13,10 @@ export type BlogPostData = {
 };
 
 export type BlogPost = {
-  content: string;
+  content?: string;
   data: BlogPostData;
   filePath: string;
+  slug: string;
 };
 
 export type GroupedBlogPosts = {

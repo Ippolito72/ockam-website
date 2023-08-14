@@ -1,6 +1,8 @@
 import { MDXRemoteProps } from 'next-mdx-remote';
+import { SimpleGrid } from '@chakra-ui/react';
 
-import StyleGuideResourceCaption from '@components/StyleGuideResourceCaption';
+import StyleGuideResourceItem from '@root/components/StyleGuideResourceItem';
+import { Feature } from '@root/views/homepage/Features';
 
 import Paragraph from './Paragraph';
 import headingsComponents from './Headings';
@@ -17,6 +19,8 @@ import ListItem from './ListItem';
 import LinkedImage from './LinkedImage';
 import Table, { tableIntegralComponents } from './Table';
 import AspectRatio from './AspectRatio';
+import Video from './Video';
+import Alert from './Alert';
 
 export default {
   p: Paragraph,
@@ -35,5 +39,9 @@ export default {
   ...tableIntegralComponents,
   ...headingsComponents,
   AspectRatio,
-  StyleGuideResourceCaption,
+  StyleGuideResourceItem,
+  Video,
+  Alert,
+  Feature,
+  SimpleGrid,
 } as MDXRemoteProps['components'];

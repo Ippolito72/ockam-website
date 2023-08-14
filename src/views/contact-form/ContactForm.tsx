@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useRef } from 'react';
+import { FormEvent, FunctionComponent, useRef, useEffect } from 'react';
 import {
   Button,
   GridItem,
@@ -53,14 +53,6 @@ const FIELDS = [
     errorMsg: 'Please use valid company name',
   },
   {
-    name: 'title',
-    type: 'text',
-    required: true,
-    placeholder: 'Your message title',
-    label: 'Title',
-    errorMsg: 'Please use valid title',
-  },
-  {
     name: 'country',
     type: 'text',
     required: true,
@@ -86,8 +78,11 @@ const FIELDS = [
   },
 ];
 
+type Props = {
+  landingPage?: string;
+};
 // TODO Types for react-hook-form - inputs, errors;
-const ContactForm: FunctionComponent = () => {
+const ContactForm: FunctionComponent<Props> = ({ landingPage }) => {
   const {
     register,
     formState: { errors, isSubmitting },
@@ -95,15 +90,34 @@ const ContactForm: FunctionComponent = () => {
     trigger,
   } = useForm();
 
+  const attribution = landingPage || 'general';
+
   const contactFormRef = useRef<HTMLFormElement>(null);
 
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  const onSubmit = async (e:FormEvent) => {
+  const onSubmit = async (e: FormEvent) => {
     const results = await trigger();
-    if(!results) {
+    if (!results) {
       e.preventDefault();
     }
   };
+
+  const sfdcTimestamp = async (): Promise<void> => {
+    const response = document.getElementById('g-recaptcha-response') as HTMLFormElement | null;
+    if (response === null || response.value.trim() === '') {
+      const elems = CONFIG.salesforce.captchaSettings;
+      elems.ts = JSON.stringify(new Date().getTime());
+      setValue('captcha_settings', JSON.stringify(elems), {
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+      setTimeout(sfdcTimestamp, 500);
+    }
+  };
+
+  useEffect(() => {
+    sfdcTimestamp();
+  });
 
   return (
     <Card w="full" maxW="2xl" p={10}>
@@ -141,7 +155,15 @@ const ContactForm: FunctionComponent = () => {
           ))}
 
           <input type="hidden" value={CONFIG.salesforce.oid} {...register('oid')} />
-          <input type="hidden" value={CONFIG.salesforce.returnUrl} {...register('retURL')} />
+          <input
+            type="hidden"
+            value={`${CONFIG.salesforce.returnUrl}&landingPage=${attribution}`}
+            {...register('retURL')}
+          />
+          <input type="hidden" value={CONFIG.salesforce.leadSource} {...register('lead_source')} />
+          <input type="hidden" value={CONFIG.salesforce.debug} {...register('debug')} />
+          <input type="hidden" value={CONFIG.salesforce.debugEmail} {...register('debugEmail')} />
+          <input type="hidden" {...register('captcha_settings')} />
 
           {errors.global && (
             <GridItem colSpan={2}>

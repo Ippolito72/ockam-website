@@ -3,47 +3,48 @@ import Image, { StaticImageData } from 'next/image';
 import { Box, Flex, Container, Text, Heading, SimpleGrid, Center } from '@chakra-ui/react';
 
 import Card from '@components/Card';
-import CasesOneImage from '@assets/images/cases1.png';
-import CasesTwoImage from '@assets/images/cases2.png';
-import CasesThreeImage from '@assets/images/cases3.png';
+import CasesOneImage from '@assets/images/influxdata.png';
+import CasesTwoImage from '@assets/images/confluent.png';
+import CasesThreeImage from '@assets/images/okta.png';
 import CTALink from '@components/CTALink';
 import Transition from '@root/components/Transition/Transition';
 
 const TITLE = 'How is Ockam Used?';
-const TEXTS = ['Ockam can, and should, be used between every application, everywhere.'];
+const TEXTS = [
+  'Run Ockam at each of your applications to create a secure communication channel directly with all of your other apps.',
+];
 
 const CASES_CARDS = [
   {
     image: CasesOneImage,
-    title: 'Orchestrate at Scale',
+    title: 'Virtually-Adjacent Databases',
     texts: [
-      'Modern applications are made up of an unmanageable number of ephemeral microservices. They are distributed, multi-cloud, and rely upon dozens of cloud marketplace services. With so many endpoints that need to interoperate, it’s become impossible to manage.',
-      'Ockam’s key generation and handshake protocols allow for dynamic, massive-scale orchestrations across complex network topologies.',
+      'Create secure communication with private databases from anywhere.',
+      'No longer do you need to expose your data to the public internet with service ports.',
     ],
-    actionHref: 'https://docs.ockam.io/use-cases/orchestrate-at-scale',
+    actionHref: 'https://docs.ockam.io/guides/use-cases',
     actionText: 'Learn more',
     isExternal: true,
   },
   {
     image: CasesTwoImage,
-    title: 'Get Out of the Middle',
+    title: 'Secure-by-Design Messaging',
     texts: [
-      'You are building an app that moves data from over-there to over-there. Perhaps it’s a message service like Kafka or RabbitMQ?',
-      'You don’t want to be liable for data that moves through your service; Particularly if its HIPAA or PCI protected data!',
-      'Ockam’s end-to-end encryption originates at the data-source and terminates at the data-target , so your app-in-the-middle can not decipher data-in-motion. ',
+      'Guarantee data authenticity and integrity of events from producers all-the-way to end consumers.',
+      'End-to-end encrypt data-in-motion through Kafka.',
     ],
-    actionHref: 'https://docs.ockam.io/use-cases/get-out-of-the-middle',
+    actionHref: 'https://docs.ockam.io/guides/use-cases',
     actionText: 'Learn more',
     isExternal: true,
   },
   {
     image: CasesThreeImage,
-    title: 'Trust Anything, Anywhere',
+    title: 'Developer-First Authentication',
     texts: [
-      'If you access data in a VPC, you are exposing your applications to threats by exposing your VPC to the internet.',
-      'Ockam’s inlets and outlets create topologies that eliminate threats from the internet for applications in VPCs. Effectively, your data can move from from VPC to VPC without exposing either application to the internet. Virtually, the applications are running next to each other in the same environment.',
+      'Authenticate and authorize every access decision.',
+      'Add identity-driven controls to enforce enterprise policies everywhere.',
     ],
-    actionHref: 'https://docs.ockam.io/use-cases/build-trust-in-anything-anywhere',
+    actionHref: 'https://docs.ockam.io/guides/use-cases',
     actionText: 'Learn more',
     isExternal: true,
   },
@@ -68,7 +69,7 @@ const CasesCard: FunctionComponent<CasesCardProps> = ({
 }) => (
   <Card p={6} height="100%">
     <Center pb={6} mb={6} borderBottom="1px" borderColor="gray.200">
-      <Image src={image} alt={`${title} image`} width={313} height={171} placeholder="blur" />
+      <Image src={image} alt={`${title} image`} width={313} height={170} placeholder="blur" />
     </Center>
 
     <Box>
@@ -88,33 +89,33 @@ const CasesCard: FunctionComponent<CasesCardProps> = ({
 );
 
 const Cases: FunctionComponent = () => (
-    <Container variant="section" id="use-cases" pt={{ base: 16, lg: 20 }} pb={{ base: 20, lg: 18 }}>
-      <Flex
-        direction="column"
-        alignItems="center"
-        textAlign="center"
-        w="full"
-        mb={{ base: 12, lg: 16 }}
-      >
-        <Heading as="h2" size="h2" mb={6}>
-          {TITLE}
-        </Heading>
+  <Container variant="section" id="use-cases" pt={{ base: 16, lg: 20 }} pb={{ base: 20, lg: 18 }}>
+    <Flex
+      direction="column"
+      alignItems="center"
+      textAlign="center"
+      w="full"
+      mb={{ base: 12, lg: 16 }}
+    >
+      <Heading as="h2" size="h2" mb={6}>
+        {TITLE}
+      </Heading>
 
-        {TEXTS.map((text) => (
-          <Text key={text} fontSize={{ lg: 'lg' }} lineHeight={1.4} _notLast={{ mb: 5 }}>
-            {text}
-          </Text>
-        ))}
-      </Flex>
+      {TEXTS.map((text) => (
+        <Text key={text} fontSize={{ lg: 'lg' }} lineHeight={1.4} _notLast={{ mb: 5 }}>
+          {text}
+        </Text>
+      ))}
+    </Flex>
 
-      <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={{ base: 6, lg: 10 }}>
-        {CASES_CARDS.map((item, index) => (
-          <Transition key={item.title} delay={(index + 1) * 300} duration={500}>
-            <CasesCard {...item} />
-          </Transition>
-        ))}
-      </SimpleGrid>
-    </Container>
-  );
+    <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={{ base: 6, lg: 10 }}>
+      {CASES_CARDS.map((item, index) => (
+        <Transition key={item.title} delay={(index + 1) * 300} duration={500}>
+          <CasesCard {...item} />
+        </Transition>
+      ))}
+    </SimpleGrid>
+  </Container>
+);
 
 export default Cases;

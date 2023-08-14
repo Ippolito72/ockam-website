@@ -1,5 +1,9 @@
 module.exports = {
-  extends: ['@masterborn/eslint-config/frontend/typescript', 'prettier'],
+  extends: [
+    '@masterborn/eslint-config/frontend/typescript',
+    'prettier',
+    'plugin:@next/next/recommended',
+  ],
   plugins: ['@emotion'],
   parserOptions: {
     project: './tsconfig.eslint.json',
@@ -16,5 +20,6 @@ module.exports = {
     'react/function-component-definition': [2, { namedComponents: 'arrow-function' }],
     'prefer-arrow-callback': 'off',
     'no-restricted-exports': 'warn',
+    'react/jsx-no-useless-fragment': 'off',
   },
 };

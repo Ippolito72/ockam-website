@@ -4,7 +4,10 @@ import MainLayoutCtaButtons from '../MainLayoutCtaButtons';
 
 import MainLayoutMobileNavMenu from './MainLayoutMobileNavMenu';
 
-const MainLayoutMobileNav: FunctionComponent = () => (
+type NavProps = {
+  landingPage?: boolean;
+};
+const MainLayoutMobileNav: FunctionComponent<NavProps> = () => (
   <>
     <MainLayoutMobileNavMenu />
 
